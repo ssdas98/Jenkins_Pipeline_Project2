@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+        environment {
+            My_env = "Hello world!"
+            }
+            stages {
+            stage('Greet') {
+                steps {
+                    input "Do you want to proceed?"
+                    echo "${env.My_env}"
+                }
+            }
+            stage('Parallel Stage') {
+                parallel {
+                    stage('Test1') {
+                        steps {
+                            echo "Running stage 1"
+                        }
+                    }
+                    stage('Test2') {
+                        steps {
+                            sleep time: 5, unit: 'SECONDS'
+                            echo "Running stage 2"
+                        }
+                    }
+                }
+            }
+        }
+        post {
+            always {
+                echo "Build is completed"
+            }
+            success {
+                echo "Build succeeded !"
+            }
+            failure {
+                echo "Build failed !"
+            }
+        }
+    }
