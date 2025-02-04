@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    environment {
+        My_email = 'ssdas181298@gmail.com'
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh "echo 'Hello'"
+                sh "echo 'Building project.'"
+                sh "mkdir -p build_output && echo 'Building artifacts' > build_output/artifact.txt"
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    try {
+                        sh "exit 1"
+                    } catch(Exception e) {
+                        echo "Build Failed : ${e}"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'build_output/artifact.txt', allowEmptyArchive: true
+            emailext(
+                subject: "Build success!",
+                body: "The build has succeded, artifact is availble to check.",
+                to: "${My_email}"
+            )
+        }
+        failure{
+             archiveArtifacts artifacts: 'build_output/artifact.txt', allowEmptyArchive: true
+            emailext(
+                subject: "Build success!",
+                body: "The build has failed, artifact is availble to check.",
+                to: "${My_email}"
+            )
+        }
+    }
+}
